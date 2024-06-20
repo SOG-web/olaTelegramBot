@@ -1,0 +1,8 @@
+{
+  "build": {
+    "env": {
+      "BOT_TOKEN": "@bot_token",
+      "GROUP_CHAT_ID": "@group_chat_id"
+    }
+  }
+}

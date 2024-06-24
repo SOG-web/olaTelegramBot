@@ -1,21 +1,16 @@
 {
-  "name": "my-telegram-bot-nextjs",
-  "version": "0.1.0",
-  "private": true,
+  "name": "olatelegrambot",
+  "version": "1.0.0",
+  "description": "Fetch files request on Telegram",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "OlaTechBro",
+  "license": "ISC",
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "telegraf": "^4.0.0"
-  },
-  "devDependencies": {
-    "eslint": "^8",
-    "eslint-config-next": "14.2.4"
+    "express": "^4.19.2",
+    "telegraf": "^4.16.3"
   }
 }

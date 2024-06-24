@@ -246,34 +246,22 @@ bot.on("text", async (ctx) => {
         `User ${requesterName} provided link: "${fileLink}" with keywords: ${keywords}`
       );
 
-      // Check if there are related files
-      const relatedFiles = Object.keys(fileIndex).filter((fileName) =>
-        keywords.some((kw) => fileName.includes(kw.toLowerCase()))
-      );
+      ctx.reply("Thank you! Please check back in 24 hours.");
 
-      if (relatedFiles.length > 0) {
-        ctx.reply(`Found related files:\n${relatedFiles.join("\n")}`);
-        relatedFiles.forEach((fileName) => {
-          const messageId = fileIndex[fileName];
-          bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
-        });
-      } else {
-        ctx.reply("File not found. Please check back in 24 hours.");
-        // Notify all admins
-        const requestMessage = `New file request from @${requesterName}:\nFile Link: ${fileLink}\nKeywords: ${keywords.join(
-          ", "
-        )}`;
-        await sendConfirmationToAdmins(GROUP_CHAT_ID, requestMessage);
+      // Notify all admins
+      const requestMessage = `New file request from @${requesterName}:\nFile Link: ${fileLink}\nKeywords: ${keywords.join(
+        ", "
+      )}`;
+      await sendConfirmationToAdmins(GROUP_CHAT_ID, requestMessage);
 
-        // Track the user's request
-        userRequests[fileLink] = {
-          userId: ctx.from.id,
-          keywords,
-        };
+      // Track the user's request
+      userRequests[fileLink] = {
+        userId: ctx.from.id,
+        keywords,
+      };
 
-        // Clean up user state
-        delete userStates[ctx.from.id];
-      }
+      // Clean up user state
+      delete userStates[ctx.from.id];
     } else if (userStates[ctx.from.id] === "awaiting_link") {
       // If the user is expected to provide a link
       const fileLink = inputText;
@@ -283,34 +271,22 @@ bot.on("text", async (ctx) => {
         `User ${requesterName} provided link: "${fileLink}" with keywords: ${keywords}`
       );
 
-      // Check if there are related files
-      const relatedFiles = Object.keys(fileIndex).filter((fileName) =>
-        keywords.some((kw) => fileName.includes(kw.toLowerCase()))
-      );
+      ctx.reply("Thank you! Please check back in 24 hours.");
 
-      if (relatedFiles.length > 0) {
-        ctx.reply(`Found related files:\n${relatedFiles.join("\n")}`);
-        relatedFiles.forEach((fileName) => {
-          const messageId = fileIndex[fileName];
-          bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
-        });
-      } else {
-        ctx.reply("File not found. Please check back in 24 hours.");
-        // Notify all admins
-        const requestMessage = `New file request from @${requesterName}:\nFile Link: ${fileLink}\nKeywords: ${keywords.join(
-          ", "
-        )}`;
-        await sendConfirmationToAdmins(GROUP_CHAT_ID, requestMessage);
+      // Notify all admins
+      const requestMessage = `New file request from @${requesterName}:\nFile Link: ${fileLink}\nKeywords: ${keywords.join(
+        ", "
+      )}`;
+      await sendConfirmationToAdmins(GROUP_CHAT_ID, requestMessage);
 
-        // Track the user's request
-        userRequests[fileLink] = {
-          userId: ctx.from.id,
-          keywords,
-        };
+      // Track the user's request
+      userRequests[fileLink] = {
+        userId: ctx.from.id,
+        keywords,
+      };
 
-        // Clean up user state
-        delete userStates[ctx.from.id];
-      }
+      // Clean up user state
+      delete userStates[ctx.from.id];
     } else {
       // Check if the input text matches any file names
       const searchResults = Object.keys(fileIndex).filter((fileName) =>

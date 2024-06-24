@@ -136,10 +136,18 @@ const notifyUserIfRequested = async (fileName) => {
         `The file "${fileName}" you requested is now available.`
       );
       const messageId = fileIndex[fileName]; // Get the message ID from file index
-      await bot.telegram.forwardMessage(userId, GROUP_CHAT_ID, messageId);
-      console.log(
-        `Notified and forwarded the file "${fileName}" to user ${userId}`
-      );
+      console.log(`Forwarding message ID ${messageId} to user ID ${userId}`);
+      try {
+        await bot.telegram.forwardMessage(userId, GROUP_CHAT_ID, messageId);
+        console.log(
+          `Successfully forwarded the file "${fileName}" to user ${userId}`
+        );
+      } catch (err) {
+        console.error(
+          `Failed to forward the file "${fileName}" to user ${userId}:`,
+          err
+        );
+      }
       delete userRequests[request]; // Remove the request after notifying and forwarding the file to the user
     }
   }
@@ -295,9 +303,26 @@ bot.on("text", async (ctx) => {
 
       if (searchResults.length > 0) {
         ctx.reply(`Found the following files:\n${searchResults.join("\n")}`);
-        searchResults.forEach((fileName) => {
+        searchResults.forEach(async (fileName) => {
           const messageId = fileIndex[fileName];
-          bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
+          console.log(
+            `Forwarding message ID ${messageId} for file "${fileName}" to user ID ${ctx.from.id}`
+          );
+          try {
+            await bot.telegram.forwardMessage(
+              ctx.from.id,
+              GROUP_CHAT_ID,
+              messageId
+            );
+            console.log(
+              `Successfully forwarded the file "${fileName}" to user ${ctx.from.id}`
+            );
+          } catch (err) {
+            console.error(
+              `Failed to forward the file "${fileName}" to user ${ctx.from.id}:`,
+              err
+            );
+          }
         });
       } else {
         ctx.reply(

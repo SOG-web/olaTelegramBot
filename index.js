@@ -16,7 +16,7 @@ const bot = new Telegraf("7426370438:AAHxJMhID6h5clGmRAwrVahMf9G-8AcFm30"); // R
 const FILE_INDEX_PATH = "fileIndex.json";
 const userRequests = {};
 const userStates = {};
-const GROUP_CHAT_ID = "-4230027494";
+const GROUP_CHAT_ID = "-1002201352861";
 
 const welcomeMessage = `Welcome to the group! Here is a guide to get you started:
 1. To find a file, send the file name directly to this bot.

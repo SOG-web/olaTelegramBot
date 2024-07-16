@@ -16,7 +16,7 @@ const bot = new Telegraf("7426370438:AAHxJMhID6h5clGmRAwrVahMf9G-8AcFm30"); // R
 const FILE_INDEX_PATH = "fileIndex.json";
 const userRequests = {};
 const userStates = {};
-const GROUP_CHAT_ID = "-1002201352861";
+const GROUP_CHAT_ID = "-1002201352861"; // Replace with your actual group chat ID
 
 const welcomeMessage = `Welcome to the group! Here is a guide to get you started:
 1. To find a file, send the file name directly to this bot.
@@ -88,25 +88,23 @@ const sendConfirmationToAdmins = async (chatId, message) => {
     console.log(`Fetching chat administrators for chat ID: ${chatId}`);
     const admins = await bot.telegram.getChatAdministrators(chatId);
     console.log(`Found ${admins.length} admins.`);
-    admins.forEach((admin) => {
-      bot.telegram
-        .sendMessage(admin.user.id, message)
-        .then(() =>
-          console.log(
-            `Sent confirmation to ${
-              admin.user.username || admin.user.first_name
-            }`
-          )
-        )
-        .catch((err) =>
-          console.error(
-            `Failed to send confirmation to ${
-              admin.user.username || admin.user.first_name
-            }`,
-            err
-          )
+    for (const admin of admins) {
+      try {
+        await bot.telegram.sendMessage(admin.user.id, message);
+        console.log(
+          `Sent confirmation to ${
+            admin.user.username || admin.user.first_name
+          }`
         );
-    });
+      } catch (err) {
+        console.error(
+          `Failed to send confirmation to ${
+            admin.user.username || admin.user.first_name
+          }`,
+          err
+        );
+      }
+    }
   } catch (err) {
     console.error("Failed to get chat administrators:", err);
   }
@@ -233,10 +231,10 @@ bot.on("text", async (ctx) => {
 
       if (searchResults.length > 0) {
         ctx.reply(`Found the following files:\n${searchResults.join("\n")}`);
-        searchResults.forEach((fileName) => {
+        for (const fileName of searchResults) {
           const messageId = fileIndex[fileName];
-          bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
-        });
+          await bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
+        }
       } else {
         ctx.reply(
           "File not found. Please drop the link of the file you are looking for."

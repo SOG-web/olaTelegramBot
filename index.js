@@ -27,11 +27,19 @@ let fileIndex = {};
 if (fs.existsSync(FILE_INDEX_PATH)) {
   try {
     const data = fs.readFileSync(FILE_INDEX_PATH, "utf-8");
-    fileIndex = JSON.parse(data);
-    console.log("File index loaded from file.");
+    if (data.trim().length === 0) {
+      console.log("File index is empty, initializing with an empty object.");
+      fileIndex = {};
+    } else {
+      fileIndex = JSON.parse(data);
+      console.log("File index loaded from file.");
+    }
   } catch (err) {
     console.error("Failed to load file index:", err);
+    fileIndex = {}; // Initialize with an empty object in case of error
   }
+} else {
+  console.log("File index does not exist, initializing with an empty object.");
 }
 
 const saveFileIndex = () => {

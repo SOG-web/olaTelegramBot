@@ -1,9 +1,9 @@
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err);
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 const express = require("express");
@@ -16,12 +16,12 @@ const bot = new Telegraf("7426370438:AAHxJMhID6h5clGmRAwrVahMf9G-8AcFm30"); // R
 const FILE_INDEX_PATH = "fileIndex.json";
 const userRequests = {};
 const userStates = {};
-const GROUP_CHAT_ID = "-1002201352861"; // Replace with your actual group chat ID
+const GROUP_CHAT_ID = "-1002201352861";
 
 const welcomeMessage = `Welcome to the group! Here is a guide to get you started:
 1. To find a file, send the file name directly to this bot.
 2. If the file is not found, you will be prompted to drop a link.
-3. An admin will be notified, and the file will be available ASAP`;
+3. An admin will be notified, and the file will be available within 24 hours.`;
 
 let fileIndex = {};
 if (fs.existsSync(FILE_INDEX_PATH)) {
@@ -51,16 +51,16 @@ bot.on("new_chat_members", (ctx) => {
         console.log(
           `Sent welcome message to ${
             newMember.username || newMember.first_name
-          }`
-        )
+          }`,
+        ),
       )
       .catch((err) =>
         console.error(
           `Failed to send welcome message to ${
             newMember.username || newMember.first_name
           }`,
-          err
-        )
+          err,
+        ),
       );
   });
 });
@@ -70,16 +70,16 @@ bot.start((ctx) => {
     .reply(welcomeMessage)
     .then(() =>
       console.log(
-        `Sent welcome message to ${ctx.from.username || ctx.from.first_name}`
-      )
+        `Sent welcome message to ${ctx.from.username || ctx.from.first_name}`,
+      ),
     )
     .catch((err) =>
       console.error(
         `Failed to send welcome message to ${
           ctx.from.username || ctx.from.first_name
         }`,
-        err
-      )
+        err,
+      ),
     );
 });
 
@@ -88,23 +88,25 @@ const sendConfirmationToAdmins = async (chatId, message) => {
     console.log(`Fetching chat administrators for chat ID: ${chatId}`);
     const admins = await bot.telegram.getChatAdministrators(chatId);
     console.log(`Found ${admins.length} admins.`);
-    for (const admin of admins) {
-      try {
-        await bot.telegram.sendMessage(admin.user.id, message);
-        console.log(
-          `Sent confirmation to ${
-            admin.user.username || admin.user.first_name
-          }`
+    admins.forEach((admin) => {
+      bot.telegram
+        .sendMessage(admin.user.id, message)
+        .then(() =>
+          console.log(
+            `Sent confirmation to ${
+              admin.user.username || admin.user.first_name
+            }`,
+          ),
+        )
+        .catch((err) =>
+          console.error(
+            `Failed to send confirmation to ${
+              admin.user.username || admin.user.first_name
+            }`,
+            err,
+          ),
         );
-      } catch (err) {
-        console.error(
-          `Failed to send confirmation to ${
-            admin.user.username || admin.user.first_name
-          }`,
-          err
-        );
-      }
-    }
+    });
   } catch (err) {
     console.error("Failed to get chat administrators:", err);
   }
@@ -132,7 +134,7 @@ bot.on("document", async (ctx) => {
         fileIndex[fileName] = ctx.message.message_id;
         saveFileIndex();
         console.log(
-          `File "${fileName}" uploaded and indexed by @${uploaderUsername}.`
+          `File "${fileName}" uploaded and indexed by @${uploaderUsername}.`,
         );
 
         const confirmationMessage = `File "${fileName}" has been saved and indexed by @${uploaderUsername}.`;
@@ -141,7 +143,7 @@ bot.on("document", async (ctx) => {
         console.log(
           `User ${
             ctx.message.from.username || ctx.message.from.first_name
-          } is not an admin, ignoring file upload.`
+          } is not an admin, ignoring file upload.`,
         );
       }
     } catch (err) {
@@ -158,7 +160,7 @@ bot.use(async (ctx, next) => {
       console.log(`Checking membership status for user ID: ${ctx.from.id}`);
       const memberInfo = await bot.telegram.getChatMember(
         GROUP_CHAT_ID,
-        ctx.from.id
+        ctx.from.id,
       );
       if (
         memberInfo.status === "member" ||
@@ -184,7 +186,7 @@ bot.on("text", async (ctx) => {
     console.log(
       `User ${
         ctx.from.username || ctx.from.first_name
-      } sent a message: "${inputText}"`
+      } sent a message: "${inputText}"`,
     );
 
     const urlPattern = /^(https?:\/\/[^\s]+)$/;
@@ -226,18 +228,18 @@ bot.on("text", async (ctx) => {
       delete userStates[ctx.from.id];
     } else {
       const searchResults = Object.keys(fileIndex).filter((fileName) =>
-        fileName.includes(inputText.toLowerCase())
+        fileName.includes(inputText.toLowerCase()),
       );
 
       if (searchResults.length > 0) {
         ctx.reply(`Found the following files:\n${searchResults.join("\n")}`);
-        for (const fileName of searchResults) {
+        searchResults.forEach((fileName) => {
           const messageId = fileIndex[fileName];
-          await bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
-        }
+          bot.telegram.forwardMessage(ctx.from.id, GROUP_CHAT_ID, messageId);
+        });
       } else {
         ctx.reply(
-          "File not found. Please drop the link of the file you are looking for."
+          "File not found. Please drop the link of the file you are looking for.",
         );
         userStates[ctx.from.id] = {
           state: "awaiting_link",

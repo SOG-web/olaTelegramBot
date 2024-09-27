@@ -221,7 +221,7 @@ bot.on("text", async (ctx) => {
       const requesterName = ctx.from.username || ctx.from.first_name;
       console.log(`User ${requesterName} provided link: "${fileLink}"`);
 
-      ctx.reply("Thank you! Please check back in 24 hours.");
+      ctx.reply("Request recieved, Please check back soon. No lose composure!!");
 
       const requestMessage = `New file request from @${requesterName}:\nFile Name: ${
         userStates[ctx.from.id].fileName

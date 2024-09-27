@@ -21,7 +21,7 @@ const GROUP_CHAT_ID = "-1002201352861";
 const welcomeMessage = `Welcome to the group! Here is a guide to get you started:
 1. To find a file, send the file name directly to this bot.
 2. If the file is not found, you will be prompted to drop a link.
-3. An admin will be notified, and the file will be available within 24 hours.`;
+3. An admin will be notified, and the file will be available as soon as possible.`;
 
 let fileIndex = {};
 if (fs.existsSync(FILE_INDEX_PATH)) {

@@ -28,26 +28,26 @@ if (fs.existsSync(FILE_INDEX_PATH)) {
   try {
     const data = fs.readFileSync(FILE_INDEX_PATH, "utf-8");
     if (data.trim().length === 0) {
-      console.log("File index is empty, initializing with an empty object.");
+      //console.log("File index is empty, initializing with an empty object.");
       fileIndex = {};
     } else {
       fileIndex = JSON.parse(data);
-      console.log("File index loaded from file.");
+      //console.log("File index loaded from file.");
     }
   } catch (err) {
-    console.error("Failed to load file index:", err);
+    //console.error("Failed to load file index:", err);
     fileIndex = {}; // Initialize with an empty object in case of error
   }
 } else {
-  console.log("File index does not exist, initializing with an empty object.");
+  //console.log("File index does not exist, initializing with an empty object.");
 }
 
 const saveFileIndex = () => {
   try {
     fs.writeFileSync(FILE_INDEX_PATH, JSON.stringify(fileIndex, null, 2));
-    console.log("File index saved to file.");
+    //console.log("File index saved to file.");
   } catch (err) {
-    console.error("Failed to save file index:", err);
+    //console.error("Failed to save file index:", err);
   }
 };
 
@@ -55,80 +55,80 @@ bot.on("new_chat_members", (ctx) => {
   ctx.message.new_chat_members.forEach((newMember) => {
     bot.telegram
       .sendMessage(newMember.id, welcomeMessage)
-      .then(() =>
-        console.log(
-          `Sent welcome message to ${
-            newMember.username || newMember.first_name
-          }`,
-        ),
-      )
-      .catch((err) =>
-        console.error(
-          `Failed to send welcome message to ${
-            newMember.username || newMember.first_name
-          }`,
-          err,
-        ),
-      );
+      .then(() => {
+        // console.log(
+        //   `Sent welcome message to ${
+        //     newMember.username || newMember.first_name
+        //   }`,
+        // ),
+      })
+      .catch((err) => {
+        // console.error(
+        //   `Failed to send welcome message to ${
+        //     newMember.username || newMember.first_name
+        //   }`,
+        //   err,
+        // ),
+      });
   });
 });
 
 bot.start((ctx) => {
   ctx
     .reply(welcomeMessage)
-    .then(() =>
-      console.log(
-        `Sent welcome message to ${ctx.from.username || ctx.from.first_name}`,
-      ),
-    )
-    .catch((err) =>
-      console.error(
-        `Failed to send welcome message to ${
-          ctx.from.username || ctx.from.first_name
-        }`,
-        err,
-      ),
-    );
+    .then(() => {
+      // console.log(
+      //   `Sent welcome message to ${ctx.from.username || ctx.from.first_name}`,
+      // ),
+    })
+    .catch((err) => {
+      // console.error(
+      //   `Failed to send welcome message to ${
+      //     ctx.from.username || ctx.from.first_name
+      //   }`,
+      //   err,
+      // ),
+    });
 });
 
 const sendConfirmationToAdmins = async (chatId, message) => {
   try {
-    console.log(`Fetching chat administrators for chat ID: ${chatId}`);
+    //console.log(`Fetching chat administrators for chat ID: ${chatId}`);
     const admins = await bot.telegram.getChatAdministrators(chatId);
-    console.log(`Found ${admins.length} admins.`);
+    //console.log(`Found ${admins.length} admins.`);
     admins.forEach((admin) => {
       bot.telegram
         .sendMessage(admin.user.id, message)
-        .then(() =>
-          console.log(
-            `Sent confirmation to ${
-              admin.user.username || admin.user.first_name
-            }`,
-          ),
-        )
-        .catch((err) =>
-          console.error(
-            `Failed to send confirmation to ${
-              admin.user.username || admin.user.first_name
-            }`,
-            err,
-          ),
-        );
+        .then(() => {
+          // console.log(
+          //   `Sent confirmation to ${
+          //     admin.user.username || admin.user.first_name
+          //   }`,
+          // ),
+        })
+        .catch((err) => {
+          // console.error(
+          //   `Failed to send confirmation to ${
+          //     admin.user.username || admin.user.first_name
+          //   }`,
+          //   err,
+          // ),
+        });
     });
   } catch (err) {
-    console.error("Failed to get chat administrators:", err);
+    //console.error("Failed to get chat administrators:", err);
   }
 };
 
 bot.on("document", async (ctx) => {
-  console.log("Received document upload event.");
+  //console.log("Received document upload event.");
   if (ctx.chat.type === "supergroup" || ctx.chat.type === "group") {
-    console.log("Processing file upload in group.");
+    //console.log("Processing file upload in group.");
     const userId = ctx.message.from.id;
 
     try {
       const memberInfo = await bot.telegram.getChatMember(ctx.chat.id, userId);
-      console.log(`Member info:`, memberInfo);
+      //console.log(`Member info:`, memberInfo);
 
       if (
         memberInfo.status === "administrator" ||
@@ -141,31 +141,31 @@ bot.on("document", async (ctx) => {
 
         fileIndex[fileName] = ctx.message.message_id;
         saveFileIndex();
-        console.log(
-          `File "${fileName}" uploaded and indexed by @${uploaderUsername}.`,
-        );
+        // console.log(
+        //   `File "${fileName}" uploaded and indexed by @${uploaderUsername}.`,
+        // );
 
         const confirmationMessage = `File "${fileName}" has been saved and indexed by @${uploaderUsername}.`;
         await sendConfirmationToAdmins(ctx.chat.id, confirmationMessage);
       } else {
-        console.log(
-          `User ${
-            ctx.message.from.username || ctx.message.from.first_name
-          } is not an admin, ignoring file upload.`,
-        );
+        // console.log(
+        //   `User ${
+        //     ctx.message.from.username || ctx.message.from.first_name
+        //   } is not an admin, ignoring file upload.`,
+        // );
       }
     } catch (err) {
-      console.error("Failed to get chat member info:", err);
+      //console.error("Failed to get chat member info:", err);
     }
   } else {
-    console.log("File upload received from non-group chat, ignoring.");
+    //console.log("File upload received from non-group chat, ignoring.");
   }
 });
 
 bot.use(async (ctx, next) => {
   if (ctx.chat.type === "private") {
     try {
-      console.log(`Checking membership status for user ID: ${ctx.from.id}`);
+      //console.log(`Checking membership status for user ID: ${ctx.from.id}`);
       const memberInfo = await bot.telegram.getChatMember(
         GROUP_CHAT_ID,
         ctx.from.id,
@@ -180,7 +180,7 @@ bot.use(async (ctx, next) => {
         ctx.reply("Only group members can interact with this bot.");
       }
     } catch (err) {
-      console.error("Failed to get chat member info:", err);
+      //console.error("Failed to get chat member info:", err);
       ctx.reply("An error occurred. Please try again later.");
     }
   } else {
@@ -191,11 +191,11 @@ bot.use(async (ctx, next) => {
 bot.on("text", async (ctx) => {
   if (ctx.chat.type === "private") {
     const inputText = ctx.message.text;
-    console.log(
-      `User ${
-        ctx.from.username || ctx.from.first_name
-      } sent a message: "${inputText}"`,
-    );
+    // console.log(
+    //   `User ${
+    //     ctx.from.username || ctx.from.first_name
+    //   } sent a message: "${inputText}"`,
+    // );
 
     const urlPattern = /^(https?:\/\/[^\s]+)$/;
     const isURL = urlPattern.test(inputText);
@@ -203,7 +203,7 @@ bot.on("text", async (ctx) => {
     if (isURL) {
       const fileLink = inputText;
       const requesterName = ctx.from.username || ctx.from.first_name;
-      console.log(`User ${requesterName} provided link: "${fileLink}"`);
+      //console.log(`User ${requesterName} provided link: "${fileLink}"`);
 
       ctx.reply("Thank you! Please check back in 24 hours.");
 
@@ -219,7 +219,7 @@ bot.on("text", async (ctx) => {
     } else if (userStates[ctx.from.id] === "awaiting_link") {
       const fileLink = inputText;
       const requesterName = ctx.from.username || ctx.from.first_name;
-      console.log(`User ${requesterName} provided link: "${fileLink}"`);
+      //console.log(`User ${requesterName} provided link: "${fileLink}"`);
 
       ctx.reply("Request recieved, Please check back soon. No lose composure!!");
 
